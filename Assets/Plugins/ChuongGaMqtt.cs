@@ -43,9 +43,7 @@ namespace M2MqttUnity.Examples
         [SerializeField]
         public Status_Data _status_data;
 
-
-
-
+        public InputField InputBrokenURI, InputUsername, InputPassword;
 
         public void SetEncrypted(bool isEncrypted)
         {
@@ -94,12 +92,11 @@ namespace M2MqttUnity.Examples
         protected override void OnConnectionFailed(string errorMessage)
         {
             Debug.Log("CONNECTION FAILED! " + errorMessage);
+            GetComponent<PanelManager>().setPanel1();
+            this.Disconnect();
         }
 
-        protected override void OnDisconnected()
-        {
-            Debug.Log("Disconnected.");
-        }
+     
 
         protected override void OnConnectionLost()
         {
@@ -110,10 +107,15 @@ namespace M2MqttUnity.Examples
 
         protected override void Start()
         {
-
+            return;
+        }
+        public void ManualStart()
+        {
+            this.brokerAddress = InputBrokenURI.text;
+            this.mqttUserName = InputUsername.text;
+            this.mqttPassword = InputPassword.text;
             base.Start();
         }
-
         protected override void DecodeMessage(string topic, byte[] message)
         {
             string msg = System.Text.Encoding.UTF8.GetString(message);
@@ -137,10 +139,16 @@ namespace M2MqttUnity.Examples
         public void PublishDeviceControl(string name, string status)
         {
             var data = new Data_Control(name, status);
-            // GetComponent<ChuongGaManager>().Update_Config_Value(_config_data);
             string msg_config = JsonConvert.SerializeObject(data);
-            client.Publish(topics[1], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
-            Debug.Log("publish led");
+            if (name == "LED")
+            {
+                client.Publish(topics[1], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
+            }
+            else if (name == "PUMP")
+            {
+                client.Publish(topics[2], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
+            }
+            Debug.Log("publish " + name);
         }
         private void OnDestroy()
         {
@@ -153,16 +161,6 @@ namespace M2MqttUnity.Examples
             //{
             //    autoConnect = true;
             //}
-        }
-
-        public void UpdateConfig()
-        {
-
-        }
-
-        public void UpdateControl()
-        {
-
         }
     }
 }
