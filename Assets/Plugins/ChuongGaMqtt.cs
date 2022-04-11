@@ -130,7 +130,7 @@ namespace M2MqttUnity.Examples
         {
             var _status_data = JsonConvert.DeserializeObject<Status_Data>(msg);
             msg_received_from_topic_status = msg;
-            Debug.Log(_status_data.humidity);
+            // Debug.Log(_status_data.humidity);
             GetComponent<ChuongGaManager>().Update_Status(_status_data);
         }
 
